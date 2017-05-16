@@ -21,11 +21,12 @@ int main(int argc, char * argv[]){
 	//char * fname = (char*)"test.fq";
 	char * ofile = (char*) "out";
 	int num_freq = 8;
+	int alternative = 0;
 
 
 	string  arg;
 	if(argc <= 1){
-		cout << "\nUsage: kmerlight  -k kmerlength -f freqs  -o outputfile -i <.fa/.fa.gz/.fasta/fasta.gz OR .fq/.fq.gz/.fastq/.fastq.gz file(s)>\n";
+		cout << "\nUsage: kmerlight  -k kmerlength -f freqs -a alternative -o outputfile -i <.fa/.fa.gz/.fasta/fasta.gz OR .fq/.fq.gz/.fastq/.fastq.gz file(s)>\n";
 		return 0;
 	}
 
@@ -52,6 +53,9 @@ int main(int argc, char * argv[]){
 			}
 			infiles = new char *[nfiles];
 			for(int j=0; j<nfiles; ++j) infiles[j] = argv[i+j+1];
+		}else if(arg.compare("-a") == 0){
+			++i;
+			alternative = atoi(argv[i]);
 		}
 		++i;
 	}
@@ -70,7 +74,7 @@ int main(int argc, char * argv[]){
 	timeinfo = localtime(&timer1);
 	cout << asctime(timeinfo) <<  flush;
 
-	F = kl.processAndEstimate(num_freq);
+	F = kl.processAndEstimate(num_freq, alternative);
 
 	time(&timer2);
 	timeinfo = localtime(&timer2);

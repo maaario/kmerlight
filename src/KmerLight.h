@@ -384,7 +384,7 @@ public:
 		return 1;
 	}
 
-	ulong_t * processAndEstimate(int num_freq){
+	ulong_t * processAndEstimate(int num_freq, int alternative){
 
 		do{
 			cout << "Processing " << filep.getfname() << " ...\n";
@@ -411,7 +411,7 @@ public:
 			CS.analyzeSketch();
 		}
 
-		return CS.computeAllF(num_freq);
+		return CS.computeAllF(num_freq, alternative);
 
 	}
 };

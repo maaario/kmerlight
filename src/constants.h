@@ -59,7 +59,7 @@ const int Constants::T = 2;
 const int Constants::G = 3;
 const int Constants::C = 4;
 
-const int Constants::Rexp = 19; //18 ~ 500 MB RAM, 19 ~ 1GB RAM
+const int Constants::Rexp = 15; //18 ~ 500 MB RAM, 19 ~ 1GB RAM
 const int Constants::Uexp = 13;
 const int Constants::RUexp = Rexp + Uexp;
 const int Constants::R = 1<< Rexp;  //pow of 2 is for faster hashing...

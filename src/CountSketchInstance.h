@@ -205,10 +205,50 @@ struct CountSketchInstance{
 		return finfo_arr[0].F;
 	}
 
-	ulong_t computeFJ(int j, long F0){ 
-
+	ulong_t computeFJ_original(int j, long F0){ 
 		int w_opt = finfo_arr[j].w_opt;
+
 		long t_opt = finfo_arr[j].t_opt;
+
+		if(w_opt <= 0 || (t_opt == 0)) { //No estimate
+			finfo_arr[j].F = 0;
+			return finfo_arr[j].F;
+		}
+
+		double x = (double) R;
+		x = 1 - (1/x);
+		double exp = (double) ((double)F0/ (double)(1 << w_opt));
+		double p0 = pow(x, exp);
+		double pj = (double) ((double) t_opt/ (double) R);
+		double val = (double)(1L<< w_opt);
+		val = val * ((double) (R -1)) * (pj / p0);
+
+		// print info about w star selected
+		// cout << j << " " << w_opt << " " << t_opt << " " << ceil(val) << "\n";
+
+		finfo_arr[j].F = (ulong_t) ceil(val);
+
+		return finfo_arr[j].F;
+	}
+
+	ulong_t computeFJ_modified(int j, long F0){ 
+		int w_opt = 0;
+		long t_opt = 0;
+		double e_opt = 0;
+
+		for(int w=1; w<=buckets; w++){
+			double w2 = (1LL<<w);
+			double e_w = pow((double)(1 - 1./R), (double)F0/w2 - 1) / w2;
+			if (e_w > e_opt){
+				e_opt = e_w;
+				w_opt = w;
+			} 
+		}
+		
+		for (int i=0; i<R; i++) {
+			int b = sketch[w_opt-1][i] & VALUEMASK;
+			if (b==j) t_opt++;
+		}
 
 		if(w_opt <= 0 || (t_opt == 0)) { //No estimate
 			finfo_arr[j].F = 0;
@@ -228,6 +268,36 @@ struct CountSketchInstance{
 		return finfo_arr[j].F;
 	}
 
+
+	ulong_t computeFJ_likelihood(int j, long F0){
+		double c = 0;
+		for(int w=1; w<60; w++){
+			double w2 = (1LL << w);
+			c += 1. / w2 * pow(1 - 1./R, F0 / w2 - 1);
+		}
+		c = 1 - c;
+
+		long long t_sum = 0;
+		for (int w=0; w<=buckets; w++) {
+			for (int i=0; i<R; i++) {
+				int b = sketch[w][i] & VALUEMASK;
+				if (b==j) t_sum++;
+			}
+		}
+
+		return (double)t_sum / (1 - c);
+	}
+
+	ulong_t computeFJ(int j, long F0, int alternative){
+		if (alternative == 0)
+			return computeFJ_original(j, F0);
+		else if (alternative == 1)
+			return computeFJ_modified(j, F0);
+		else
+			return computeFJ_likelihood(j, F0);
+	}
+
+	/* In the orignal code, this method is never used
 	ulong_t * computeAllF(long F0){ 
 
 		ulong_t* F = new ulong_t[num_freq];
@@ -235,8 +305,7 @@ struct CountSketchInstance{
 		for(int j=0; j<= num_freq; ++j) F[j] = computeFJ(j, F0);
 		return F;
 	}
-
-
+	*/
 
 };
 const int CountSketchInstance::R = Constants::R;

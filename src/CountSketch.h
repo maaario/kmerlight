@@ -106,22 +106,22 @@ struct CountSketch{
 		return vals[Constants::copies >> 1]; //middle value
 	}
 
-	static ulong_t computeFJ(int j, ulong_t F0){
+	static ulong_t computeFJ(int j, ulong_t F0, int alternative){
 		ulong_t vals[Constants::copies];
 		for (int i=0; i< Constants::copies; ++i){
-			vals[i] = sketch_arr[i].computeFJ(j, F0);
+			vals[i] = sketch_arr[i].computeFJ(j, F0, alternative);
 
 		}
 		std::sort(vals, vals + Constants::copies);
 		return vals[Constants::copies >> 1]; //middle value
 	}
 
-	static ulong_t * computeAllF(int num_freq){
+	static ulong_t * computeAllF(int num_freq, int alternative){
 		ulong_t F0 = computeF0();
 		ulong_t *vals = new ulong_t[num_freq + 1];
 		vals[0] = F0;
 		for(int j=1; j<= num_freq; ++j){
-			vals[j] = computeFJ(j, F0);
+			vals[j] = computeFJ(j, F0, alternative);
 		}
 		return vals;
 	}
